@@ -29,8 +29,8 @@ RUN apk add --no-cache \
 RUN mkdir /usr/share/landoop
 
 # Add Confluent Distribution
-ENV CP_VERSION="3.3.1" KAFKA_VERSION="0.11.0.1"
-ARG CP_URL="https://packages.confluent.io/archive/3.3/confluent-oss-${CP_VERSION}-2.11.tar.gz"
+ENV CP_VERSION="4.0.0" KAFKA_VERSION="1.0.0"
+ARG CP_URL="https://packages.confluent.io/archive/4.0/confluent-oss-${CP_VERSION}-2.11.tar.gz"
 RUN wget "$CP_URL" -O /opt/confluent.tar.gz \
     && mkdir -p /opt/confluent \
     && tar --no-same-owner --strip-components 1 -xzf /opt/confluent.tar.gz -C /opt/confluent \
@@ -40,7 +40,7 @@ RUN wget "$CP_URL" -O /opt/confluent.tar.gz \
 
 
 # Add Stream Reactor and Elastic Search (for elastic connector)
-ENV STREAM_REACTOR_VERSION="0.4.0"
+ENV STREAM_REACTOR_VERSION="1.0.0"
 ARG STREAM_REACTOR_URL=https://archive.landoop.com/stream-reactor/stream-reactor-${STREAM_REACTOR_VERSION}_connect${KAFKA_VERSION}.tar.gz
 RUN wget "${STREAM_REACTOR_URL}" -O stream-reactor.tar.gz \
     && mkdir -p /opt/connectors \
@@ -51,7 +51,7 @@ RUN wget "${STREAM_REACTOR_URL}" -O stream-reactor.tar.gz \
     && mv /elasticsearch-2.4.1/lib/*.jar /opt/connectors/kafka-connect-elastic/ \
     && rm -rf /elasticsearch-2.4.1* \
     && wget http://central.maven.org/maven2/org/apache/activemq/activemq-all/5.15.2/activemq-all-5.15.2.jar -P /opt/connectors/kafka-connect-jms \
-    && echo "plugin.path=/opt/connectors,/extra-connect-jars,/connectors" >> /opt/confluent/etc/schema-registry/connect-avro-distributed.properties
+    && echo "plugin.path=/opt/confluent/share/java,/opt/connectors,/extra-connect-jars,/connectors" >> /opt/confluent/etc/schema-registry/connect-avro-distributed.properties
 
 # Add glibc (for Lenses branch, for HDFS connector etc as some java libs need some functions provided by glibc)
 RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/unreleased/glibc-2.26-r0.apk \
@@ -80,10 +80,10 @@ RUN echo "access.control.allow.methods=GET,POST,PUT,DELETE,OPTIONS" >> /opt/conf
 #     && unzip /kafka-manager-1.3.2.1.zip -d /opt \
 #     && rm -rf /kafka-manager-1.3.2.1.zip
 
-# Add Twitter Connector
-ARG TWITTER_CONNECTOR_URL="https://archive.landoop.com/third-party/kafka-connect-twitter/kafka-connect-twitter-0.1-master-af63e4c-cp3.3.0-jar-with-dependencies.jar"
-RUN mkdir -p /opt/confluent/share/java/kafka-connect-twitter \
-    && wget "$TWITTER_CONNECTOR_URL" -P /opt/confluent/share/java/kafka-connect-twitter
+# # Add Twitter Connector
+# ARG TWITTER_CONNECTOR_URL="https://archive.landoop.com/third-party/kafka-connect-twitter/kafka-connect-twitter-0.1-master-af63e4c-cp3.3.0-jar-with-dependencies.jar"
+# RUN mkdir -p /opt/confluent/share/java/kafka-connect-twitter \
+#     && wget "$TWITTER_CONNECTOR_URL" -P /opt/confluent/share/java/kafka-connect-twitter
 
 # Add dumb init and quickcert
 RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 -O /usr/local/bin/dumb-init \
