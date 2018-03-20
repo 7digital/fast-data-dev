@@ -165,6 +165,10 @@ RUN echo "BUILD_BRANCH=${BUILD_BRANCH}"      | tee /build.info \
     && echo "CP_VERSION=${CP_VERSION}"       | tee -a /build.info \
     && echo "STREAM_REACTOR_VERSION=${STREAM_REACTOR_VERSION}" | tee -a /build.info
 
+ARG MS_JDBC_VERSION=6.4.0
+RUN wget https://github.com/Microsoft/mssql-jdbc/releases/download/v$MS_JDBC_VERSION/mssql-jdbc-$MS_JDBC_VERSION.jre8.jar -O /connectors/mssql-jdbc-jre8.jar
+
+
 EXPOSE 2181 3030 3031 8081 8082 8083 9092
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD ["/usr/local/bin/setup-and-run.sh"]
