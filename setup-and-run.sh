@@ -21,9 +21,12 @@ DEBUG="${DEBUG:-false}"
 TOPIC_DELETE="${TOPIC_DELETE:-true}"
 SAMPLEDATA="${SAMPLEDATA:-1}"
 RUNNING_SAMPLEDATA="${RUNNING_SAMPLEDATA:-0}"
+BROKERS="${BROKERS:-localhost:9092}"
+JAAS_CONFIG="${JAAS_CONFIG:-}"
 export ZK_PORT BROKER_PORT BROKER_SSL_PORT REGISTRY_PORT REST_PORT CONNECT_PORT WEB_PORT RUN_AS_ROOT
 export ZK_JMX_PORT BROKER_JMX_PORT REGISTRY_JMX_PORT REST_JMX_PORT CONNECT_JMX_PORT DISABLE_JMX
 export ENABLE_SSL SSL_EXTRA_HOSTS DEBUG TOPIC_DELETE SAMPLEDATA RUNNING_SAMPLEDATA
+export BROKERS
 
 
 PORTS="$ZK_PORT $BROKER_PORT $REGISTRY_PORT $REST_PORT $CONNECT_PORT $WEB_PORT $KAFKA_MANAGER_PORT"
@@ -52,25 +55,82 @@ listeners=PLAINTEXT://:$BROKER_PORT
 confluent.support.metrics.enable=false
 EOF
 
-## Disabled because the basic replacements catch it
-# cat <<EOF >>/opt/confluent/etc/schema-registry/schema-registry.properties
+## Connect specific
+cat <<EOF >>/opt/confluent/etc/kafka/connect-distributed.properties
+group.id=connect-cluster
+key.converter=org.apache.kafka.connect.json.JsonConverter
+value.converter=org.apache.kafka.connect.json.JsonConverter
+key.converter.schemas.enable=true
+value.converter.schemas.enable=true
+internal.key.converter=org.apache.kafka.connect.json.JsonConverter
+internal.value.converter=org.apache.kafka.connect.json.JsonConverter
+internal.key.converter.schemas.enable=false
+internal.value.converter.schemas.enable=false
+offset.storage.topic=connect-offsets
+offset.storage.replication.factor=1
+config.storage.topic=connect-configs
+config.storage.replication.factor=1
+status.storage.topic=connect-status
+status.storage.replication.factor=1
+offset.flush.interval.ms=10000
+plugin.path=/opt/confluent/share/java,/opt/connectors,/extra-connect-jars,/connectors
 
-# listeners=http://0.0.0.0:$REGISTRY_PORT
-# EOF
+security.protocol=SSL
+
+bootstrap.servers=$BROKERS
+sasl.mechanism=SCRAM-SHA-256
+security.protocol=SASL_SSL
+sasl.jaas.config=$JAAS_CONFIG
+
+producer.sasl.mechanism=SCRAM-SHA-256
+producer.security.protocol=SASL_SSL
+producer.sasl.jaas.config=$JAAS_CONFIG
+
+consumer.sasl.mechanism=SCRAM-SHA-256
+consumer.security.protocol=SASL_SSL
+consumer.sasl.jaas.config=$JAAS_CONFIG
+EOF
+
+# Disabled because the basic replacements catch it
+cat <<EOF >/opt/confluent/etc/schema-registry/schema-registry.properties
+listeners=http://0.0.0.0:8081
+kafkastore.topic=_schemas
+debug=false
+access.control.allow.methods=GET,POST,PUT,DELETE,OPTIONS
+access.control.allow.origin=*
+
+
+kafkastore.bootstrap.servers=$BROKERS
+kafkastore.security.protocol=SASL_SSL
+kafkastore.sasl.mechanism=SCRAM-SHA-256
+kafkastore.sasl.jaas.config=$JAAS_CONFIG
+sasl.jaas.config=$JAAS_CONFIG
+EOF
 
 ## REST Proxy specific
 cat <<EOF >>/opt/confluent/etc/kafka-rest/kafka-rest.properties
 
 listeners=http://0.0.0.0:$REST_PORT
 schema.registry.url=http://localhost:$REGISTRY_PORT
-zookeeper.connect=localhost:$ZK_PORT
+
+bootstrap.servers=$BROKERS
+
+client.security.protocol=SSL
+security.protocol=SSL
+client.security.protocol=SASL_SSL
+client.sasl.mechanism=SCRAM-SHA-256
+client.sasl.jaas.config=$JAAS_CONFIG
+
+
 # fix for Kafka REST consumer issues
 consumer.request.timeout.ms=30000
 EOF
 
 ## Schema Registry specific
 cat <<EOF >>/opt/confluent/etc/schema-registry/connect-avro-distributed.properties
-
+kafkastore.bootstrap.servers=$BROKERS
+client.security.protocol=SASL_SSL
+client.sasl.jaas.config=$JAAS_CONFIG
 rest.port=$CONNECT_PORT
 EOF
 
