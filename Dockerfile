@@ -18,12 +18,16 @@ RUN apk add --no-cache \
         supervisor \
         tar \
         wget \
+        python3 \
+        py-pip \
     && echo "progress = dot:giga" | tee /etc/wgetrc \
     && mkdir /opt \
     && wget https://gitlab.com/andmarios/checkport/uploads/3903dcaeae16cd2d6156213d22f23509/checkport -O /usr/local/bin/checkport \
     && chmod +x /usr/local/bin/checkport \
     && mkdir /extra-connect-jars /connectors \
     && mkdir /etc/supervisord.d /etc/supervisord.templates.d
+
+RUN pip3 install awscli==1.15.0
 
 # Create Landoop configuration directory
 RUN mkdir /usr/share/landoop
@@ -172,7 +176,8 @@ RUN echo "BUILD_BRANCH=${BUILD_BRANCH}"      | tee /build.info \
 
 ARG MS_JDBC_VERSION=6.4.0
 RUN wget https://github.com/Microsoft/mssql-jdbc/releases/download/v$MS_JDBC_VERSION/mssql-jdbc-$MS_JDBC_VERSION.jre8.jar -O /connectors/mssql-jdbc-jre8.jar
-
+ARG CALCITE_LINQ4J_VERSION=1.16.0
+RUN wget http://central.maven.org/maven2/org/apache/calcite/calcite-linq4j/$CALCITE_LINQ4J_VERSION/calcite-linq4j-$CALCITE_LINQ4J_VERSION.jar -O /connectors/calcite-linqj.jar
 
 EXPOSE 2181 3030 3031 8081 8082 8083 9092
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]

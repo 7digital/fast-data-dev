@@ -22,13 +22,20 @@ TOPIC_DELETE="${TOPIC_DELETE:-true}"
 SAMPLEDATA="${SAMPLEDATA:-1}"
 RUNNING_SAMPLEDATA="${RUNNING_SAMPLEDATA:-0}"
 BROKERS="${BROKERS:-localhost:9092}"
+SECRET_KEYNAME="${SECRET_KEYNAME:-}"
 JAAS_USER="${JAAS_USER:-}"
 JAAS_PASSWORD="${JAAS_PASSWORD:-}"
-JAAS_CONFIG="${JAAS_CONFIG:-"org.apache.kafka.common.security.scram.ScramLoginModule required username=\"$JAAS_USER\" password=\"$JAAS_PASSWORD\";"}"
 export ZK_PORT BROKER_PORT BROKER_SSL_PORT REGISTRY_PORT REST_PORT CONNECT_PORT WEB_PORT RUN_AS_ROOT
 export ZK_JMX_PORT BROKER_JMX_PORT REGISTRY_JMX_PORT REST_JMX_PORT CONNECT_JMX_PORT DISABLE_JMX
 export ENABLE_SSL SSL_EXTRA_HOSTS DEBUG TOPIC_DELETE SAMPLEDATA RUNNING_SAMPLEDATA
 export BROKERS
+
+if [[ ! -z "$JAAS_PASSWORD" ]]; then
+    AWS_SECRET_ARN=$(aws secretsmanager list-secrets --query "SecretList[?Name==\`$SECRET_KEYNAME\`].ARN" --output text --region $REGION)
+    JAAS_PASSWORD=$(aws secretsmanager get-secret-value --secret-id $AWS_SECRET_ARN --query "SecretString" --output text --region $REGION)
+fi
+
+JAAS_CONFIG="${JAAS_CONFIG:-"org.apache.kafka.common.security.scram.ScramLoginModule required username=\"$JAAS_USER\" password=\"$JAAS_PASSWORD\";"}"
 
 
 PORTS="$ZK_PORT $BROKER_PORT $REGISTRY_PORT $REST_PORT $CONNECT_PORT $WEB_PORT $KAFKA_MANAGER_PORT"
@@ -60,14 +67,21 @@ EOF
 ## Connect specific
 cat <<EOF >>/opt/confluent/etc/kafka/connect-distributed.properties
 group.id=connect-cluster
-key.converter=org.apache.kafka.connect.json.JsonConverter
-value.converter=org.apache.kafka.connect.json.JsonConverter
-key.converter.schemas.enable=true
-value.converter.schemas.enable=true
+#key.converter=org.apache.kafka.connect.json.JsonConverter
+#value.converter=org.apache.kafka.connect.json.JsonConverter
+#key.converter.schemas.enable=true
+#value.converter.schemas.enable=true
 internal.key.converter=org.apache.kafka.connect.json.JsonConverter
 internal.value.converter=org.apache.kafka.connect.json.JsonConverter
 internal.key.converter.schemas.enable=false
 internal.value.converter.schemas.enable=false
+
+key.converter=io.confluent.connect.avro.AvroConverter
+key.converter.schema.registry.url=http://localhost:8081
+value.converter=io.confluent.connect.avro.AvroConverter
+value.converter.schema.registry.url=http://localhost:8081
+
+
 offset.storage.topic=connect-offsets
 offset.storage.replication.factor=1
 config.storage.topic=connect-configs
@@ -76,6 +90,8 @@ status.storage.topic=connect-status
 status.storage.replication.factor=1
 offset.flush.interval.ms=10000
 plugin.path=/opt/confluent/share/java,/opt/connectors,/extra-connect-jars,/connectors
+schema.registry.url=http://localhost:$REGISTRY_PORT
+cleanup.policy=compact
 
 security.protocol=SSL
 
