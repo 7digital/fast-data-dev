@@ -137,7 +137,8 @@ security.protocol=SSL
 client.security.protocol=SASL_SSL
 client.sasl.mechanism=SCRAM-SHA-256
 client.sasl.jaas.config=$JAAS_CONFIG
-
+access.control.allow.methods=GET,POST,PUT,DELETE,OPTIONS
+access.control.allow.origin=*
 
 # fix for Kafka REST consumer issues
 consumer.request.timeout.ms=30000
