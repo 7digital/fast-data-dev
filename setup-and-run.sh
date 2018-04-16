@@ -76,9 +76,14 @@ internal.key.converter.schemas.enable=false
 internal.value.converter.schemas.enable=false
 
 key.converter=io.confluent.connect.avro.AvroConverter
-key.converter.schema.registry.url=http://localhost:8081
+key.converter.schema.registry.url=http://0.0.0.0:8081
 value.converter=io.confluent.connect.avro.AvroConverter
-value.converter.schema.registry.url=http://localhost:8081
+value.converter.schema.registry.url=http://0.0.0.0:8081
+
+rest.advertised.host.name=0.0.0.0
+rest.advertised.port=8083
+rest.host.name=0.0.0.0
+rest.port=8083
 
 
 offset.storage.topic=connect-offsets
@@ -89,7 +94,7 @@ status.storage.topic=connect-status
 status.storage.replication.factor=1
 offset.flush.interval.ms=10000
 plugin.path=/opt/confluent/share/java,/opt/connectors,/extra-connect-jars,/connectors
-schema.registry.url=http://localhost:$REGISTRY_PORT
+schema.registry.url=http://0.0.0.0:$REGISTRY_PORT
 cleanup.policy=compact
 
 security.protocol=SSL
@@ -128,7 +133,7 @@ EOF
 cat <<EOF >>/opt/confluent/etc/kafka-rest/kafka-rest.properties
 
 listeners=http://0.0.0.0:$REST_PORT
-schema.registry.url=http://localhost:$REGISTRY_PORT
+schema.registry.url=http://0.0.0.0:$REGISTRY_PORT
 
 bootstrap.servers=$BROKERS
 
