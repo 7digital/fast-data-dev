@@ -47,6 +47,12 @@ if [[ ! -z "$PASSWORD" ]]; then
     echo "basicauth / \"${USER}\" \"${PASSWORD}\"" >> /usr/share/landoop/Caddyfile
 fi
 
+if [[ ! -z "$PASSWORD_KEYNAME" ]]; then
+    KEYNAME_ARN=$(aws secretsmanager list-secrets --query "SecretList[?Name==\`$PASSWORD_KEYNAME\`].ARN" --output text --region $REGION)
+    PASSWORD=$(aws secretsmanager get-secret-value --secret-id $KEYNAME_ARN --query "SecretString" --output text --region $REGION)
+    echo "basicauth / \"${USER}\" \"${PASSWORD}\"" >> /usr/share/landoop/Caddyfile
+fi
+
 # Adjust custom ports
 
 ## Some basic replacements
@@ -81,9 +87,9 @@ value.converter=io.confluent.connect.avro.AvroConverter
 value.converter.schema.registry.url=http://0.0.0.0:8081
 
 rest.advertised.host.name=0.0.0.0
-rest.advertised.port=8083
+rest.advertised.port=$CONNECT_PORT
 rest.host.name=0.0.0.0
-rest.port=8083
+rest.port=$CONNECT_PORT
 
 
 offset.storage.topic=connect-offsets
