@@ -27,14 +27,16 @@ RUN apk add --no-cache \
     && mkdir /extra-connect-jars /connectors \
     && mkdir /etc/supervisord.d /etc/supervisord.templates.d
 
-RUN pip3 install awscli==1.15.0
+RUN pip3 install awscli==1.15.0 \
+                 requests==2.18.4
 
 # Create Landoop configuration directory
 RUN mkdir /usr/share/landoop
 
 # Add Confluent Distribution
-ENV CP_VERSION="4.0.0" KAFKA_VERSION="1.0.0"
-ARG CP_URL="https://packages.confluent.io/archive/4.0/confluent-oss-${CP_VERSION}-2.11.tar.gz"
+ENV CP_VERSION="4.1.0" KAFKA_VERSION="1.1.0"
+ARG CP_URL="https://packages.confluent.io/archive/4.1/confluent-oss-${CP_VERSION}-2.11.tar.gz"
+#ARG CP_URL="https://packages.confluent.io/archive/4.0/confluent-oss-${CP_VERSION}-2.11.tar.gz"
 RUN wget "$CP_URL" -O /opt/confluent.tar.gz \
     && mkdir -p /opt/confluent \
     && tar --no-same-owner --strip-components 1 -xzf /opt/confluent.tar.gz -C /opt/confluent \
