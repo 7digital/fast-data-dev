@@ -47,7 +47,7 @@ RUN wget "$CP_URL" -O /opt/confluent.tar.gz \
 
 # Add Stream Reactor and Elastic Search (for elastic connector)
 ENV STREAM_REACTOR_VERSION="1.0.0"
-ARG STREAM_REACTOR_URL=https://archive.landoop.com/stream-reactor/stream-reactor-${STREAM_REACTOR_VERSION}_connect${KAFKA_VERSION}.tar.gz
+ARG STREAM_REACTOR_URL=https://archive.landoop.com/stream-reactor/stream-reactor-${STREAM_REACTOR_VERSION}_connect1.0.0.tar.gz
 RUN wget "${STREAM_REACTOR_URL}" -O stream-reactor.tar.gz \
     && mkdir -p /opt/connectors \
     && tar -xzf stream-reactor.tar.gz --no-same-owner --strip-components=1 -C /opt/connectors \
@@ -175,6 +175,8 @@ RUN echo "BUILD_BRANCH=${BUILD_BRANCH}"      | tee /build.info \
     && echo "KAFKA_VERSION=${KAFKA_VERSION}" | tee -a /build.info \
     && echo "CP_VERSION=${CP_VERSION}"       | tee -a /build.info \
     && echo "STREAM_REACTOR_VERSION=${STREAM_REACTOR_VERSION}" | tee -a /build.info
+
+COPY connect connect/
 
 ARG MS_JDBC_VERSION=6.4.0
 RUN wget https://github.com/Microsoft/mssql-jdbc/releases/download/v$MS_JDBC_VERSION/mssql-jdbc-$MS_JDBC_VERSION.jre8.jar -O /connectors/mssql-jdbc-jre8.jar
