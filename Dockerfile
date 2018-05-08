@@ -162,6 +162,7 @@ RUN chmod +x /usr/local/bin/setup-and-run.sh /usr/local/bin/logs-to-kafka.sh \
            /etc/supervisord.templates.d/05-connect-distributed.conf \
            /etc/supervisord.templates.d/06-caddy.conf \
            /etc/supervisord.templates.d/07-smoke-tests.conf \
+           /etc/supervisord.templates.d/09-connectors.conf \
            > /etc/supervisord.d/01-fast-data.conf
 
 ARG BUILD_BRANCH
@@ -176,7 +177,7 @@ RUN echo "BUILD_BRANCH=${BUILD_BRANCH}"      | tee /build.info \
     && echo "CP_VERSION=${CP_VERSION}"       | tee -a /build.info \
     && echo "STREAM_REACTOR_VERSION=${STREAM_REACTOR_VERSION}" | tee -a /build.info
 
-COPY connect connect/
+COPY connectors connectors/
 
 ARG MS_JDBC_VERSION=6.4.0
 RUN wget https://github.com/Microsoft/mssql-jdbc/releases/download/v$MS_JDBC_VERSION/mssql-jdbc-$MS_JDBC_VERSION.jre8.jar -O /connectors/mssql-jdbc-jre8.jar
