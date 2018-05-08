@@ -162,7 +162,6 @@ RUN chmod +x /usr/local/bin/setup-and-run.sh /usr/local/bin/logs-to-kafka.sh \
            /etc/supervisord.templates.d/05-connect-distributed.conf \
            /etc/supervisord.templates.d/06-caddy.conf \
            /etc/supervisord.templates.d/07-smoke-tests.conf \
-           /etc/supervisord.templates.d/09-connectors.conf \
            > /etc/supervisord.d/01-fast-data.conf
 
 ARG BUILD_BRANCH
