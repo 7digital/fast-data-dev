@@ -157,8 +157,7 @@ ADD setup-and-run.sh logs-to-kafka.sh /usr/local/bin/
 ADD https://github.com/Landoop/kafka-autocomplete/releases/download/0.3/kafka /usr/share/landoop/kafka-completion
 RUN chmod +x /usr/local/bin/setup-and-run.sh /usr/local/bin/logs-to-kafka.sh \
     && ln -s /usr/share/landoop/bashrc /root/.bashrc \
-    && cat /etc/supervisord.templates.d/01-zookeeper.conf \
-           /etc/supervisord.templates.d/03-schema-registry.conf \
+    && cat /etc/supervisord.templates.d/03-schema-registry.conf \
            /etc/supervisord.templates.d/04-rest-proxy.conf \
            /etc/supervisord.templates.d/05-connect-distributed.conf \
            /etc/supervisord.templates.d/06-caddy.conf \
