@@ -142,6 +142,7 @@ listeners=http://0.0.0.0:$REST_PORT
 schema.registry.url=http://0.0.0.0:$REGISTRY_PORT
 
 bootstrap.servers=$BROKERS
+zookeeper.connect=$ZOOKEEPER
 
 client.security.protocol=SSL
 security.protocol=SSL
