@@ -35,7 +35,7 @@ RUN mkdir /usr/share/landoop
 
 # Add Confluent Distribution
 ENV CP_VERSION="4.0.0" KAFKA_VERSION="1.0.0"
-ARG CP_URL="https://packages.confluent.io/archive/4.0/confluent-oss-${CP_VERSION}-2.11.tar.gz"
+ARG CP_URL="https://packages.confluent.io/archive/4.1/confluent-oss-${CP_VERSION}-2.11.tar.gz"
 #ARG CP_URL="https://packages.confluent.io/archive/4.0/confluent-oss-${CP_VERSION}-2.11.tar.gz"
 RUN wget "$CP_URL" -O /opt/confluent.tar.gz \
     && mkdir -p /opt/confluent \
