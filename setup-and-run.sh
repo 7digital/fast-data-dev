@@ -103,20 +103,20 @@ plugin.path=/opt/confluent/share/java,/opt/connectors,/extra-connect-jars,/conne
 schema.registry.url=http://0.0.0.0:$REGISTRY_PORT
 cleanup.policy=compact
 
-security.protocol=SSL
-
+#security.protocol=SSL
+#
 bootstrap.servers=$BROKERS
-sasl.mechanism=SCRAM-SHA-256
-security.protocol=SASL_SSL
-sasl.jaas.config=$JAAS_CONFIG
-
-producer.sasl.mechanism=SCRAM-SHA-256
-producer.security.protocol=SASL_SSL
-producer.sasl.jaas.config=$JAAS_CONFIG
-
-consumer.sasl.mechanism=SCRAM-SHA-256
-consumer.security.protocol=SASL_SSL
-consumer.sasl.jaas.config=$JAAS_CONFIG
+#sasl.mechanism=SCRAM-SHA-256
+#security.protocol=SASL_SSL
+#sasl.jaas.config=$JAAS_CONFIG
+#
+#producer.sasl.mechanism=SCRAM-SHA-256
+#producer.security.protocol=SASL_SSL
+#producer.sasl.jaas.config=$JAAS_CONFIG
+#
+#consumer.sasl.mechanism=SCRAM-SHA-256
+#consumer.security.protocol=SASL_SSL
+#consumer.sasl.jaas.config=$JAAS_CONFIG
 EOF
 
 # Disabled because the basic replacements catch it
