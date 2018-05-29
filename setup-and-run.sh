@@ -144,11 +144,11 @@ schema.registry.url=http://0.0.0.0:$REGISTRY_PORT
 bootstrap.servers=$BROKERS
 zookeeper.connect=$ZOOKEEPER
 
-client.security.protocol=SSL
-security.protocol=SSL
-client.security.protocol=SASL_SSL
-client.sasl.mechanism=SCRAM-SHA-256
-client.sasl.jaas.config=$JAAS_CONFIG
+#client.security.protocol=SSL
+#security.protocol=SSL
+#client.security.protocol=SASL_SSL
+#client.sasl.mechanism=SCRAM-SHA-256
+#client.sasl.jaas.config=$JAAS_CONFIG
 access.control.allow.methods=GET,POST,PUT,DELETE,OPTIONS
 access.control.allow.origin=*
 
@@ -159,9 +159,45 @@ EOF
 ## Schema Registry specific
 cat <<EOF >>/opt/confluent/etc/schema-registry/connect-avro-distributed.properties
 kafkastore.bootstrap.servers=$BROKERS
-client.security.protocol=SASL_SSL
-client.sasl.jaas.config=$JAAS_CONFIG
+#client.security.protocol=SASL_SSL
+#client.sasl.jaas.config=$JAAS_CONFIG
 rest.port=$CONNECT_PORT
+EOF
+
+## KSQL specific
+cat <<EOF >>/opt/confluent/etc/ksql/ksql-server.properties
+bootstrap.servers=$BROKERS
+# sasl.jaas.config=$JAAS_CONFIG
+
+# Set the retries to Integer.MAX_VALUE to ensure that transient failures
+# will not result in data loss.
+producer.retries=2147483647
+
+# Set the batch expiry to Long.MAX_VALUE to ensure that queries will not
+# terminate if the underlying Kafka cluster is unavailable for a period of
+# time.
+kafka.streams.producer.confluent.batch.expiry.ms=9223372036854775807
+
+# Allows more frequent retries of requests when there are failures,
+# enabling quicker recovery.
+kafka.streams.producer.request.timeout.ms=300000
+
+# Set the maximum allowable time for the producer to block to
+# Long.MAX_VALUE. This allows KSQL to pause processing if the underlying
+# Kafka cluster is unavailable.
+kafka.streams.producer.max.block.ms=9223372036854775807
+
+# Set the replication factor for internal topics, the command topic, and
+# output topics to be 3 for better fault tolerance and durability. Note:
+# the value 3 requires at least 3 brokers in your Kafka cluster.
+ksql.streams.replication.factor=3
+kafka.streams.ksql.sink.replicas=3
+
+# Bump the number of replicas for state storage for stateful operations
+# like aggregations and joins. By having two replicas (one main and one
+# standby) recovery from node failures is quicker since the state doesn't
+# have to be rebuilt from scratch.
+ksql.streams.num.standby.replicas=1
 EOF
 
 ## Other infra specific (caddy, web ui, tests, logs)
