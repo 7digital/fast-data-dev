@@ -128,11 +128,11 @@ access.control.allow.methods=GET,POST,PUT,DELETE,OPTIONS
 access.control.allow.origin=*
 
 
-kafkastore.bootstrap.servers=$BROKERS
-kafkastore.security.protocol=SASL_SSL
-kafkastore.sasl.mechanism=SCRAM-SHA-256
-kafkastore.sasl.jaas.config=$JAAS_CONFIG
-sasl.jaas.config=$JAAS_CONFIG
+#kafkastore.bootstrap.servers=$BROKERS
+#kafkastore.security.protocol=SASL_SSL
+#kafkastore.sasl.mechanism=SCRAM-SHA-256
+#kafkastore.sasl.jaas.config=$JAAS_CONFIG
+#sasl.jaas.config=$JAAS_CONFIG
 EOF
 
 ## REST Proxy specific
