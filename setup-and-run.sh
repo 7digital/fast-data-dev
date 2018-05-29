@@ -126,7 +126,7 @@ kafkastore.topic=_schemas
 debug=false
 access.control.allow.methods=GET,POST,PUT,DELETE,OPTIONS
 access.control.allow.origin=*
-
+kafkastore.connection.url=$ZOOKEEPER
 
 #kafkastore.bootstrap.servers=$BROKERS
 #kafkastore.security.protocol=SASL_SSL
